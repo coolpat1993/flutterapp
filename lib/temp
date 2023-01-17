@@ -1,0 +1,27 @@
+Container(
+          color: Colors.black,
+          width: double.infinity,
+          height: double.infinity,
+          child: GridView.count(
+            mainAxisSpacing: 3,
+            crossAxisSpacing: 3,
+            crossAxisCount: 4,
+            children: letters.map((letter) {
+              return TextButton(
+                child: Text(
+                  letter,
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0), fontSize: 30),
+                ),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(Color(0xFF00cfff)),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ))),
+                onPressed: () {},
+              );
+            }).toList(),
+          ),
+        )
