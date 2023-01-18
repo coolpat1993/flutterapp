@@ -32,7 +32,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       selectedKey = letter;
     });
-    print('$currentText');
   }
 
   @override
@@ -103,6 +102,8 @@ class _MyAppState extends State<MyApp> {
                     children: letters.map((letter) {
                       return TextButton(
                         style: ButtonStyle(
+                            overlayColor: MaterialStateColor.resolveWith(
+                                (states) => Color.fromARGB(115, 255, 255, 255)),
                             backgroundColor: letter != selectedKey
                                 ? MaterialStateProperty.all(
                                     const Color(0xFF00cfff))

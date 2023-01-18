@@ -28,7 +28,7 @@ Future<Album> fetchAlbum() async {
     // If the server did return a 200 OK response,
     // then parse the JSON.
     List<dynamic> list = json.decode(response.body)['questions'];
-    Album fact = Album.fromJson(list[2]);
+    Album fact = Album.fromJson(list[0]);
     return fact;
   } else {
     // If the server did not return a 200 OK response,
