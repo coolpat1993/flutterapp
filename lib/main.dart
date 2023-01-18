@@ -1,11 +1,39 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:myapp/models/getRequest.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<Album> futureAlbum;
+
+  @override
+  void initState() {
+    super.initState();
+    futureAlbum = fetchAlbum();
+  }
+
+  String currentText = 'SQ App';
+  String currentQuestion = 'What is the Capital of France?';
+  String selectedKey = '';
+
+  void launchWebView(letter) {
+    setState(() {
+      selectedKey = letter;
+    });
+    print('$currentText');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,26 +66,36 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-              backgroundColor: Color.fromARGB(255, 0, 0, 0),
-              title: const Text('This is is my new App!')),
+              backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+              title: Text(currentText)),
           body: Container(
             color: Colors.black,
             child: Column(
               children: [
-                // ignore: prefer_const_constructors
-                Text(
-                  'What is the capital of France?',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Colors.white),
-                  textAlign: TextAlign.center,
+                FutureBuilder<Album>(
+                  future: futureAlbum,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      print(snapshot.data!.question!);
+                      return Text(
+                        snapshot.data!.question!,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            color: Colors.white),
+                        textAlign: TextAlign.center,
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+                    return const CircularProgressIndicator();
+                  },
                 ),
                 Expanded(
                     child: Container(
                   color: Colors.black,
-                  width: double.infinity,
-                  height: double.infinity,
+                  width: 380,
+                  height: 380,
                   child: GridView.count(
                     mainAxisSpacing: 3,
                     crossAxisSpacing: 3,
@@ -65,13 +103,18 @@ class MyApp extends StatelessWidget {
                     children: letters.map((letter) {
                       return TextButton(
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                const Color(0xFF00cfff)),
+                            backgroundColor: letter != selectedKey
+                                ? MaterialStateProperty.all(
+                                    const Color(0xFF00cfff))
+                                : MaterialStateProperty.all(
+                                    const Color.fromARGB(255, 255, 255, 255)),
                             shape: MaterialStateProperty.all<
                                 RoundedRectangleBorder>(RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ))),
-                        onPressed: () {},
+                        onPressed: () {
+                          launchWebView(letter);
+                        },
                         child: Text(
                           letter,
                           style: const TextStyle(
@@ -81,7 +124,15 @@ class MyApp extends StatelessWidget {
                       );
                     }).toList(),
                   ),
-                ))
+                )),
+                Text(
+                  'picked answer: $selectedKey',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           )),
