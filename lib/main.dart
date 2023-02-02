@@ -27,11 +27,18 @@ class _MyAppState extends State<MyApp> {
 
   String currentText = 'SQ App';
   String currentQuestion = 'What is the Capital of France?';
-  String selectedKey = '';
+  String currentAnswer = 'F';
+  String selectedKey = '@';
 
   void launchWebView(letter) {
     setState(() {
       selectedKey = letter;
+    });
+  }
+
+  void setAnswer(answer) {
+    setState(() {
+      currentAnswer = answer;
     });
   }
 
@@ -77,7 +84,6 @@ class _MyAppState extends State<MyApp> {
                 future: futureAlbum,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    print(snapshot.data!.question!);
                     return Text(
                       snapshot.data!.question!,
                       style: const TextStyle(
@@ -118,6 +124,7 @@ class _MyAppState extends State<MyApp> {
                           ))),
                       onPressed: () {
                         launchWebView(letter);
+
                       },
                       child: Text(
                         letter,
@@ -140,8 +147,12 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         Center(
-          child: RiveAnimation.asset('assets/rivs/rocket_sq_colors.riv'),
-        ),
+            child: selectedKey == currentAnswer
+                ?
+                RiveAnimation.asset('assets/rivs/rocket_sq_colors.riv',
+                    fit: BoxFit.cover,
+                  )
+                : Container()),
       ]),
     ));
   }
