@@ -1,37 +1,148 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:myapp/models/getRequest.dart';
+import 'dart:async';
 import 'package:rive/rive.dart';
 
 void main() {
-  runApp(MaterialApp(home: SimpleAnimation()));
+  runApp(const MyApp());
 }
 
-class SimpleAnimation extends StatelessWidget {
-  const SimpleAnimation({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<Album> futureAlbum;
+
+  @override
+  void initState() {
+    super.initState();
+    futureAlbum = fetchAlbum();
+  }
+
+  String currentText = 'SQ App';
+  String currentQuestion = 'What is the Capital of France?';
+  String selectedKey = '';
+
+  void launchWebView(letter) {
+    setState(() {
+      selectedKey = letter;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xff7c94b6),
-              image: const DecorationImage(
-                image: NetworkImage(
-                    'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl-2.jpg'),
-                fit: BoxFit.cover,
+    final List<String> letters = [
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+      'G',
+      'H',
+      'I',
+      'J',
+      'K',
+      'L',
+      'M',
+      'N',
+      'O',
+      'P',
+      'R',
+      'S',
+      'T',
+      'U',
+      'Q V',
+      'W',
+      'Y',
+      'X Z'
+    ];
+    return MaterialApp(
+        home: Scaffold(
+      appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+          title: Text(currentText)),
+      body: Stack(children: [
+        Container(
+          color: Colors.black,
+          child: Column(
+            children: [
+              FutureBuilder<Album>(
+                future: futureAlbum,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    print(snapshot.data!.question!);
+                    return Text(
+                      snapshot.data!.question!,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                          color: Colors.white),
+                      textAlign: TextAlign.center,
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('${snapshot.error}');
+                  }
+                  return const CircularProgressIndicator();
+                },
               ),
-              border: Border.all(
-                width: 8,
+              Expanded(
+                  child: Container(
+                color: Colors.black,
+                width: 380,
+                height: 380,
+                child: GridView.count(
+                  mainAxisSpacing: 3,
+                  crossAxisSpacing: 3,
+                  crossAxisCount: 4,
+                  children: letters.map((letter) {
+                    return TextButton(
+                      style: ButtonStyle(
+                          overlayColor: MaterialStateColor.resolveWith(
+                              (states) => Color.fromARGB(115, 255, 255, 255)),
+                          backgroundColor: letter != selectedKey
+                              ? MaterialStateProperty.all(
+                                  const Color(0xFF00cfff))
+                              : MaterialStateProperty.all(
+                                  const Color.fromARGB(255, 255, 255, 255)),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ))),
+                      onPressed: () {
+                        launchWebView(letter);
+                      },
+                      child: Text(
+                        letter,
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 0, 0, 0), fontSize: 30),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              )),
+              Text(
+                'picked answer: $selectedKey',
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white),
+                textAlign: TextAlign.center,
               ),
-              borderRadius: BorderRadius.circular(12),
-            ),
+            ],
           ),
-          Center(
-            child: RiveAnimation.asset('assets/rivs/rocket_sq_colors.riv'),
-          ),
-        ],
-      ),
-    );
+        ),
+        Center(
+          child: RiveAnimation.asset('assets/rivs/rocket_sq_colors.riv'),
+        ),
+      ]),
+    ));
   }
 }
