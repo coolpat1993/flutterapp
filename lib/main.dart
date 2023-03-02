@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:myapp/models/getRequest.dart';
 import 'dart:async';
 import 'package:rive/rive.dart';
+import 'sQColours.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,19 +28,21 @@ class _MyAppState extends State<MyApp> {
 
   String currentText = 'SQ App';
   String currentQuestion = 'What is the Capital of France?';
-  String currentAnswer = 'F';
+  String currentAnswer = 'A';
   String selectedKey = '@';
 
   void launchWebView(letter) {
     setState(() {
       selectedKey = letter;
     });
-  }
-
-  void setAnswer(answer) {
-    setState(() {
-      currentAnswer = answer;
-    });
+    if (selectedKey == currentAnswer) {
+      print({selectedKey, currentAnswer});
+      Future.delayed(Duration(milliseconds: 6000), () {
+        setState(() {
+          selectedKey = '';
+        });
+      });
+    }
   }
 
   @override
@@ -114,7 +117,7 @@ class _MyAppState extends State<MyApp> {
                               (states) => Color.fromARGB(115, 255, 255, 255)),
                           backgroundColor: letter != selectedKey
                               ? MaterialStateProperty.all(
-                                  const Color(0xFF00cfff))
+                                  SQBrandColors.SQCyan)
                               : MaterialStateProperty.all(
                                   const Color.fromARGB(255, 255, 255, 255)),
                           shape:
@@ -124,7 +127,6 @@ class _MyAppState extends State<MyApp> {
                           ))),
                       onPressed: () {
                         launchWebView(letter);
-
                       },
                       child: Text(
                         letter,
@@ -148,8 +150,8 @@ class _MyAppState extends State<MyApp> {
         ),
         Center(
             child: selectedKey == currentAnswer
-                ?
-                RiveAnimation.asset('assets/rivs/rocket_sq_colors.riv',
+                ? RiveAnimation.asset(
+                    'assets/rivs/rocket_sq_colors.riv',
                     fit: BoxFit.cover,
                   )
                 : Container()),
